@@ -1,5 +1,4 @@
 using UnityEngine;
-
 public class Player : MonoBehaviour
 {
     private Rigidbody2D rb;
@@ -11,6 +10,10 @@ public class Player : MonoBehaviour
     public Transform groundCheck;
 
     bool isGrounded;
+
+    public bool isFlipped = false;
+    int gravityMult = 1;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -23,16 +26,29 @@ public class Player : MonoBehaviour
 
         if (isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
-            rb.linearVelocityY = jumpSpeed;
+            rb.linearVelocityY = jumpSpeed * gravityMult;
         }
-
-        if (rb.linearVelocityY < 0)
+        if (isFlipped)
         {
-            rb.gravityScale = 4f;
+            if (rb.linearVelocityY > 0)
+            {
+                rb.gravityScale = -4f;
+            }
+            else
+            {
+                rb.gravityScale = -2f;
+            }
         }
         else
         {
-            rb.gravityScale = 2f;
+            if (rb.linearVelocityY < 0)
+            {
+                rb.gravityScale = 4f;
+            }
+            else
+            {
+                rb.gravityScale = 2f;
+            }
         }
         if (isGrounded)
         {
@@ -47,6 +63,17 @@ public class Player : MonoBehaviour
         {
             rb.linearVelocityY *= 0.55f;
         }
+
+
+        if (Input.GetKeyDown(KeyCode.Q) && isGrounded)
+        {
+            isFlipped = !isFlipped;
+            gravityMult = (isFlipped ? -1 : 1);
+            rb.linearVelocityY = -gravityMult * 10f;
+        }
+        transform.localScale = new Vector2(transform.localScale.x, gravityMult);
+        //this is it i g
+
     }
     private void FixedUpdate()
     {
